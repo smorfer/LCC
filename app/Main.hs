@@ -1,6 +1,6 @@
 module Main where
 
-import Lib
+import LCC (lccTest)
 
 main :: IO ()
-main = someFunc
+main = lccTest
