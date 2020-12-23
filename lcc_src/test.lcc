@@ -1,0 +1,9 @@
+INC = |n f x. f ((n f) x)
+PLUS = |m n.(m INC) n
+ZERO = |s z. z
+ONE = INC ZERO
+TWO = INC ONE
+FOUR = (PLUS TWO) TWO 
+PLUS
+TWO
+FOUR

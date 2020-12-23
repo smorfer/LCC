@@ -1,5 +1,5 @@
-module LCC.Language.Types (
-  Binding,
-) where
+module LCC.Language.Types (Binding) where
 
 type Binding = Char
+
+
