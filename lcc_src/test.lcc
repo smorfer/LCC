@@ -1,9 +1,15 @@
-INC = |n f x. f ((n f) x)
-PLUS = |m n.(m INC) n
+ INC = |n f x. f ((n f) x)
+ PLUS = |m n.m (INC n) 
 ZERO = |s z. z
 ONE = INC ZERO
-TWO = INC ONE
-FOUR = (PLUS TWO) TWO 
-PLUS
+ONE
+TWO = (PLUS ONE) ONE
 TWO
+THREE = (PLUS ONE) TWO
+THREES = (PLUS TWO) ONE
+THREE
+THREES
+FOUR = (PLUS TWO) TWO
 FOUR
+
+(a TWO) (b TWO)

@@ -29,4 +29,3 @@ getFreeBindings main sub =
      `intersection` symmetricDifference
        allBindings
        (mainBindings `union` subBindings)
-

@@ -25,4 +25,7 @@ allowedBindings = fromList $ ['a' .. 'z'] ++ ['A' .. 'Z']
 isReducible :: LExpr -> Bool
 isReducible (Application (Abstraction _ _) _) = True
 isReducible (Application (Curried _ _) _) = True
+isReducible (Application lhs rhs) = isReducible lhs || isReducible rhs
+isReducible (Abstraction _ e) = isReducible e
+isReducible (Curried _ e) = isReducible e
 isReducible _ = False

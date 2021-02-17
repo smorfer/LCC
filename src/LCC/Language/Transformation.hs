@@ -15,6 +15,8 @@ import           LCC.Utils.Set
 import qualified Debug.Trace as Debug
 import qualified Data.Map.Strict as MS
 import           Data.Maybe
+import           GHC.Base (Alternative((<|>)))
+import           Data.Either
 
 type ExprMap = MS.Map String LExpr
 
@@ -88,12 +90,27 @@ getConsts (Application lhs rhs) = getConsts lhs ++ getConsts rhs
 getConsts (Abstraction _ e) = getConsts e
 getConsts (Curried _ e) = getConsts e
 
+sub :: ExprMap -> LExpr -> Either LExpr LExpr
+sub m (Const s) = Right
+  $ case MS.lookup s m of
+    Just v  -> v
+    Nothing -> error $ "Identifier " ++ s ++ " is not declared"
+sub m (Application lhs rhs) = case sub m lhs of
+  Right e -> Right $ Application e rhs
+  Left _  -> case sub m rhs of
+    Right e' -> Right $ Application lhs e'
+    Left _   -> Left $ Application lhs rhs
+sub m (Abstraction b e) = case sub m e of
+  Right e' -> Right $ Abstraction b e'
+  Left _   -> Left $ Abstraction b e
+sub m (Curried bs e) = case sub m e of
+  Right e' -> Right $ Curried bs e'
+  Left _   -> Left $ Curried bs e
+sub m v@(Var _) = Left v
+
 substitute :: ExprMap -> LExpr -> LExpr
-substitute m (Const s) = case MS.lookup s m of
-  Just v  -> v
-  Nothing -> error $ "Identifier " ++ s ++ " is not declared"
-substitute m (Application lhs rhs) =
-  Application (substitute m lhs) (substitute m rhs)
-substitute m (Abstraction b exp) = Abstraction b $ substitute m exp
-substitute m (Curried bs exp) = Curried bs $ substitute m exp
-substitute _ a = a
+substitute m e = either id id
+  $ until
+    isLeft
+    (\exp -> sub (prepareMap m (either id id exp)) (either id id exp))
+    (Right e)
